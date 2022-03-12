@@ -40,21 +40,21 @@ abstract class MemberMixin {
 }
 
 class Members<T extends MemberMixin> extends StatefulWidget {
-  List<T> members;
-  double avatarDiameter = 70;
-  double leftInset = 15;
-  double borderSize = 2;
-  Color backgroundColor;
-  Color foregroundColor;
-  Color borderColor;
+  final List<T> members;
+  final double avatarDiameter;
+  final double leftInset;
+  final double borderSize;
+  final Color backgroundColor;
+  final Color foregroundColor;
+  final Color borderColor;
 
-  Members({
+  const Members({
     Key? key,
     required this.members,
     this.avatarDiameter = 50,
     this.leftInset = 15,
     this.borderSize = 2,
-    this.backgroundColor = kPrimaryColor,
+    this.backgroundColor = Colors.grey,
     this.foregroundColor = Colors.white,
     this.borderColor = Colors.white,
   }) : super(key: key);
@@ -149,6 +149,7 @@ class _MembersState extends State<Members> {
           ),
           child: Text(
             member != null && !member.hasAvatar() ? member.initials() : text,
+            style: const TextStyle(fontSize: 12),
           ),
         ),
       ),

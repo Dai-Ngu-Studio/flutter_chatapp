@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_chatapp/constants.dart';
 import 'package:flutter_chatapp/firebase_options.dart';
 import 'package:flutter_chatapp/routes.dart';
-import 'package:flutter_chatapp/views/screens/login/login_screen.dart';
 import 'package:flutter_chatapp/views/screens/splash/splash_screen.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
