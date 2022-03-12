@@ -2,7 +2,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_chatapp/constants.dart';
 import 'package:flutter_chatapp/firebase_options.dart';
+import 'package:flutter_chatapp/routes.dart';
+import 'package:flutter_chatapp/views/screens/login/login_screen.dart';
+import 'package:flutter_chatapp/views/screens/splash/splash_screen.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 Future<void> backgroundHandler(RemoteMessage message) async {
   print(message.data.toString());
@@ -10,7 +15,8 @@ Future<void> backgroundHandler(RemoteMessage message) async {
 }
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -29,36 +35,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    FlutterNativeSplash.remove();
+
     return MaterialApp(
-      title: 'Flutter ChatApp',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Flutter ChatApp"),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Flutter ChatApp',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
+      title: 'DaiNgu ChatApp',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: chatappColor),
+      initialRoute: SplashScreen.routeName,
+      routes: routes,
     );
   }
 }
