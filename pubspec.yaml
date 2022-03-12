@@ -38,16 +38,56 @@ dependencies:
 
   page_transition: ^2.0.5
 
+  intl: ^0.17.0
+
+  image_picker: ^0.8.4+11
+
+  file_picker: ^4.5.1
+
+  mime: ^1.0.1
+
+  open_file: ^3.2.1
+
+  flutter_chat_ui: ^1.5.5
+
+  cached_network_image: ^3.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^1.0.0
 
-flutter:
+  build_runner:
 
+  flutter_gen_runner:
+
+  flutter_launcher_icons: "^0.9.2"
+
+# cli: flutter pub run flutter_launcher_icons:main
+flutter_icons:
+  image_path: "assets/images/flutter_chatapp_logo.png"
+  android: true
+  ios: true
+  remove_alpha_ios: true
+
+# cli: fluttergen -c pubspec.yaml
+flutter_gen:
+  integrations:
+    flutter_svg: true
+
+# cli: flutter pub run flutter_native_splash:create
+flutter_native_splash:
+  color: '#f6f5fb'
+  branding: assets/images/flutter_chatapp_logo.png
+  android_gravity: fill
+  ios_content_mode: scaleAspectFill
+  android: true
+  ios: true
+
+flutter:
   uses-material-design: true
 
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/images/flutter_chatapp_logo.png
+    - assets/svgs/google.svg
