@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 const kPrimaryColor = Color(0xFF6b3aee);
 const kSecondaryColor = Color(0xFFf6f5fb);
 const kBackgroundColor = Color(0xFFF2F3F8);
+const kPadding = EdgeInsets.all(16.0);
 const kAnimationDuration = Duration(milliseconds: 200);
 
 const MaterialColor chatappColor = MaterialColor(
