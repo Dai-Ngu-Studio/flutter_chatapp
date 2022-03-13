@@ -212,4 +212,13 @@ class FireStoreDB {
       },
     );
   }
+
+  Future<void> addMembersToRoom(
+      {required String roomId, List<types.User>? users}) async {
+    await firestore.collection("rooms").doc(roomId).update(
+      {
+        "users": FieldValue.arrayUnion([...?users?.map((u) => u.id).toList()]),
+      },
+    );
+  }
 }
