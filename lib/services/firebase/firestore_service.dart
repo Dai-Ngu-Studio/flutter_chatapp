@@ -49,7 +49,7 @@ class FireStoreDB {
     String? imageUrl,
     required String roomName,
     required String roomDescription,
-    List<types.User>? users,
+    required List<types.User> users,
   }) async {
     await firestore.collection("rooms").add({
       'createdAt': FieldValue.serverTimestamp(),
@@ -58,7 +58,7 @@ class FireStoreDB {
       'description': roomDescription,
       'updatedAt': FieldValue.serverTimestamp(),
       'users': [
-        ...?users?.map((u) => u.id).toList(),
+        ...users.map((u) => u.id).toList(),
         FirebaseAuth.instance.currentUser!.uid
       ],
       'lastMessage': null,
@@ -121,12 +121,6 @@ class FireStoreDB {
     );
   }
 
-  UploadTask uploadFile(File image, String fileName) {
-    Reference reference = FirebaseStorage.instance.ref().child(fileName);
-    UploadTask uploadTask = reference.putFile(image);
-    return uploadTask;
-  }
-
   void sendMessage(dynamic partialMessage, String roomId) async {
     final firebaseUser = FirebaseAuth.instance.currentUser;
 
@@ -179,7 +173,6 @@ class FireStoreDB {
     if (message != null) {
       final messageMap = message.toJson();
       messageMap['createdAt'] = FieldValue.serverTimestamp();
-
       await firestore.collection('rooms/$roomId/messages').add(messageMap);
     }
   }
