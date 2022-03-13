@@ -1,8 +1,4 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chatapp/constants.dart';
 import 'package:flutter_chatapp/services/firebase/firestore_service.dart';
@@ -113,7 +109,7 @@ class _HomeBodyState extends State<HomeBody> {
                       ),
                       lastMessageSender: room['lastSenderName'] ?? '',
                       lastMessage: room['lastMessage'] ?? '',
-                      lastMessageTime: room['lastMessageTime'] ?? '',
+                      lastMessageTime: room['lastMessageTime'],
                     ),
                   );
                 },
