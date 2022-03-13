@@ -174,6 +174,14 @@ class FireStoreDB {
       final messageMap = message.toJson();
       messageMap['createdAt'] = FieldValue.serverTimestamp();
       await firestore.collection('rooms/$roomId/messages').add(messageMap);
+
+      Map<String, dynamic> lastMessageMap = {
+        'lastMessage': messageMap['text'],
+        'lastSenderName': messageMap['author']['firstName'],
+        'lastMessageTime': messageMap['createdAt']
+      };
+
+      await firestore.collection('rooms').doc(roomId).update(lastMessageMap);
     }
   }
 
