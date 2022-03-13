@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chatapp/utils/utilities.dart';
 
@@ -53,9 +54,24 @@ class FireStoreDB {
       'name': roomName,
       'description': roomDescription,
       'updatedAt': FieldValue.serverTimestamp(),
-      'members': users?.map((u) => u.id).toList(),
+      'members': [
+        ...?users?.map((u) => u.id).toList(),
+        FirebaseAuth.instance.currentUser!.uid
+      ],
       'lastMessage': null,
-      'lastSenderMessage': null,
+      'lastSenderName': null,
+      'lastMessageTime': null,
     });
+  }
+
+  Stream<QuerySnapshot> room() {
+    final fu = FirebaseAuth.instance.currentUser;
+
+    if (fu == null) return const Stream.empty();
+
+    return firestore
+        .collection("rooms")
+        .where("members", arrayContains: fu.uid)
+        .snapshots();
   }
 }

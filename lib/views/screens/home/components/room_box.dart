@@ -6,20 +6,20 @@ import 'package:intl/intl.dart';
 class RoomBox extends StatelessWidget {
   const RoomBox({
     Key? key,
-    // required this.roomID,
-    // required this.roomName,
-    // this.roomImage,
-    // required this.lastMessageSender,
-    // required this.lastMessage,
-    // required this.lastMessageTime,
+    required this.roomID,
+    required this.roomName,
+    this.roomImage,
+    required this.lastMessageSender,
+    required this.lastMessage,
+    required this.lastMessageTime,
   }) : super(key: key);
 
-  // final String roomID;
-  // final String roomName;
-  // final String? roomImage;
-  // final String lastMessageSender;
-  // final String lastMessage;
-  // final String lastMessageTime;
+  final String roomID;
+  final String roomName;
+  final String? roomImage;
+  final String? lastMessageSender;
+  final String? lastMessage;
+  final String? lastMessageTime;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +52,7 @@ class RoomBox extends StatelessWidget {
                     style: const TextStyle(color: Colors.white),
                   ),
                   foregroundImage: NetworkImage(
-                    "https://cdn.discordapp.com/icons/843109712458809374/7d783e29b11cd0a0224efac16d14a48c.webp?size=96",
+                    roomImage!,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -61,7 +61,7 @@ class RoomBox extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "DaiNgu",
+                      roomName,
                       softWrap: true,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -70,36 +70,40 @@ class RoomBox extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    RichText(
-                      text: TextSpan(
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                        children: [
-                          WidgetSpan(
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth:
-                                    MediaQuery.of(context).size.width * 0.55,
+                    lastMessageSender!.isNotEmpty
+                        ? RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
                               ),
-                              child: Text(
-                                '${'Roid'}: ${'Đm NDungx gà quáaaaaaa zxczxc zxzx c'}',
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey,
+                              children: [
+                                WidgetSpan(
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                              0.55,
+                                    ),
+                                    child: Text(
+                                      '$lastMessageSender: $lastMessage',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                TextSpan(
+                                  text: lastMessageTime!.isNotEmpty
+                                      ? ' • ${DateFormat('MMM yy').format(DateTime.fromMillisecondsSinceEpoch(int.parse(lastMessageTime!)))}'
+                                      : '',
+                                ),
+                              ],
                             ),
-                          ),
-                          TextSpan(
-                            text:
-                                ' • ${DateFormat('MMM yy').format(DateTime.now())}',
-                          ),
-                        ],
-                      ),
-                    )
+                          )
+                        : const SizedBox.shrink(),
                   ],
                 ),
               ],

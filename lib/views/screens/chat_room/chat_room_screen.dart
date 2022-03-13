@@ -40,3 +40,9 @@ class ChatRoomScreen extends StatelessWidget {
     );
   }
 }
+
+class ChatRoomScreenArguments {
+  final String roomID;
+
+  ChatRoomScreenArguments(this.roomID);
+}
