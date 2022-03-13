@@ -50,7 +50,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             icon: const Icon(Icons.more_horiz, size: 20),
             splashRadius: 18,
             onPressed: () {
-              Navigator.of(context).pushNamed(RoomSettingScreen.routeName);
+              Navigator.of(context).pushNamed(
+                RoomSettingScreen.routeName,
+                arguments: args,
+              );
             },
           ),
         ],

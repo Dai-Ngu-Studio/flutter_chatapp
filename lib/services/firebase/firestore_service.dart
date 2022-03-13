@@ -203,4 +203,13 @@ class FireStoreDB {
         .doc(message.id)
         .update(messageMap);
   }
+
+  Future<void> leaveRoom(
+      {required types.User user, required String roomId}) async {
+    await firestore.collection('rooms').doc(roomId).update(
+      {
+        "users": FieldValue.arrayRemove([user.id])
+      },
+    );
+  }
 }
