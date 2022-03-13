@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chatapp/constants.dart';
 import 'package:flutter_chatapp/views/screens/user_setting/user_setting_body.dart';
 
 class UserSettingScreen extends StatelessWidget {
@@ -25,6 +26,7 @@ class UserSettingScreen extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
+      backgroundColor: kSecondaryColor,
       body: const UserSettingBody(),
     );
   }
