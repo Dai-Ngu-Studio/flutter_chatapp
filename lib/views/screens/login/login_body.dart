@@ -1,12 +1,15 @@
 import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chatapp/constants.dart';
 import 'package:flutter_chatapp/gen/assets.gen.dart';
 import 'package:flutter_chatapp/services/firebase/auth_service.dart';
+import 'package:flutter_chatapp/services/firebase/firestore_service.dart';
 import 'package:flutter_chatapp/views/screens/home/home.dart';
 import 'package:flutter_chatapp/views/widgets/adaptive_button.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 
 class LoginBody extends StatefulWidget {
   const LoginBody({Key? key}) : super(key: key);
@@ -19,6 +22,18 @@ class _LoginBodyState extends State<LoginBody> {
   final AuthService _googleSignIn = AuthService();
   bool _isLoading = false;
   String? fcmToken;
+  late FireStoreDB db;
+
+  initialize() {
+    db = FireStoreDB();
+    db.initialize();
+  }
+
+  @override
+  void initState() {
+    initialize();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,9 +157,23 @@ class _LoginBodyState extends State<LoginBody> {
     _googleSignIn.googleLogin().whenComplete(() {
       if (_firebaseAuth.currentUser != null) {
         _firebaseAuth.currentUser!.getIdToken().then((idToken) {
-          getFCMToken().then((value) {
-            // TODO: add user to firestore
-            Navigator.of(context).pushReplacementNamed(Home.routeName);
+          getFCMToken().then((fcmToken) {
+            db.getUserByID(_firebaseAuth.currentUser!.uid).then((value) {
+              final List<DocumentSnapshot> documents = value.docs;
+
+              if (documents.isEmpty) {
+                db.createUser(
+                  types.User(
+                    id: _firebaseAuth.currentUser!.uid,
+                    firstName: _firebaseAuth.currentUser!.displayName,
+                    imageUrl: _firebaseAuth.currentUser!.photoURL,
+                  ),
+                  email: _firebaseAuth.currentUser!.email!,
+                  fcmToken: fcmToken!,
+                );
+              }
+              Navigator.of(context).pushReplacementNamed(Home.routeName);
+            });
           });
         }).catchError((error) {
           log(error.toString());
