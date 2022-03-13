@@ -29,14 +29,15 @@ class AddMemberScreen extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: AddMemberBody(onPressed: args.onPressd, users: args.users),
+      body: AddMemberBody(onPressed: args.onPressed, users: args.users),
     );
   }
 }
 
 class AddMemberScreenArguments {
-  final Function onPressd;
+  final Function onPressed;
   final List<types.User> users;
 
-  const AddMemberScreenArguments({required this.onPressd, required this.users});
+  const AddMemberScreenArguments(
+      {required this.onPressed, required this.users});
 }

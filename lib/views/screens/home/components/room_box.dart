@@ -2,21 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chatapp/constants.dart';
 import 'package:flutter_chatapp/views/screens/chat_room/chat_room_screen.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 
 class RoomBox extends StatelessWidget {
   const RoomBox({
     Key? key,
-    required this.roomID,
-    required this.roomName,
-    this.roomImage,
+    required this.room,
     required this.lastMessageSender,
     required this.lastMessage,
     required this.lastMessageTime,
   }) : super(key: key);
 
-  final String roomID;
-  final String roomName;
-  final String? roomImage;
+  final types.Room room;
   final String? lastMessageSender;
   final String? lastMessage;
   final String? lastMessageTime;
@@ -52,7 +49,7 @@ class RoomBox extends StatelessWidget {
                     style: const TextStyle(color: Colors.white),
                   ),
                   foregroundImage: NetworkImage(
-                    roomImage!,
+                    room.imageUrl ?? "",
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -61,7 +58,7 @@ class RoomBox extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      roomName,
+                      room.name!,
                       softWrap: true,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -97,7 +94,7 @@ class RoomBox extends StatelessWidget {
                                 ),
                                 TextSpan(
                                   text: lastMessageTime!.isNotEmpty
-                                      ? ' • ${DateFormat('MMM yy').format(DateTime.fromMillisecondsSinceEpoch(int.parse(lastMessageTime!)))}'
+                                      ? ' • ${DateFormat('MMM yy').format(DateTime.fromMicrosecondsSinceEpoch(int.parse(lastMessageTime!)))}'
                                       : '',
                                 ),
                               ],
@@ -118,7 +115,10 @@ class RoomBox extends StatelessWidget {
                   splashColor: Colors.grey.withOpacity(0.15),
                   highlightColor: Colors.grey.withOpacity(0.1),
                   onTap: () {
-                    Navigator.of(context).pushNamed(ChatRoomScreen.routeName);
+                    Navigator.of(context).pushNamed(
+                      ChatRoomScreen.routeName,
+                      arguments: ChatRoomScreenArguments(room),
+                    );
                   },
                 ),
               ),

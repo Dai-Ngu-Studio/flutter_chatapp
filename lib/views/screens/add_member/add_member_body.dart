@@ -176,11 +176,13 @@ class _AddMemberBodyState extends State<AddMemberBody> {
               });
               if (widget.users
                   .every((element) => element.id != document?['uid'])) {
-                widget.onPressed(types.User(
-                  id: document?['uid'],
-                  firstName: document?['displayName'],
-                  imageUrl: document?['imageUrl'],
-                ));
+                widget.onPressed(
+                  types.User(
+                    id: document?['uid'],
+                    firstName: document?['displayName'],
+                    imageUrl: document?['imageUrl'],
+                  ),
+                );
               } else {
                 const snackBar = SnackBar(
                   content: Text("This member has added to group"),

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +50,9 @@ class _HomeBodyState extends State<HomeBody> {
           child: StreamBuilder<QuerySnapshot>(
             stream: db.room(),
             builder: (context, snapshot) {
-              if (snapshot.data!.size == 0) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.data!.size == 0) {
                 return Container(
                   alignment: Alignment.center,
                   margin: const EdgeInsets.only(
@@ -63,19 +67,39 @@ class _HomeBodyState extends State<HomeBody> {
                 itemBuilder: (context, index) {
                   final room = snapshot.data!.docs[index];
 
-                  print(snapshot.data!.docs[index].data());
+                  print(room);
+
+                  print("room: ${snapshot.data!.docs[index].data()}");
+
+                  List<types.User> users = [];
+
+                  for (var user in room['users']) {
+                    users.add(types.User(id: user));
+                  }
 
                   return GestureDetector(
                     onTap: () {
                       Navigator.of(context).pushNamed(
                         ChatRoomScreen.routeName,
-                        arguments: ChatRoomScreenArguments(room.id),
+                        arguments: ChatRoomScreenArguments(
+                          types.Room(
+                            id: room.id,
+                            users: room['users'],
+                            name: room['name'],
+                            imageUrl: room['imageUrl'],
+                            type: types.RoomType.group,
+                          ),
+                        ),
                       );
                     },
                     child: RoomBox(
-                      roomID: room.id,
-                      roomName: room['name'],
-                      roomImage: room['imageUrl'] ?? '',
+                      room: types.Room(
+                        id: room.id,
+                        users: users,
+                        name: room['name'],
+                        imageUrl: room['imageUrl'],
+                        type: types.RoomType.group,
+                      ),
                       lastMessageSender: room['lastSenderName'] ?? '',
                       lastMessage: room['lastMessage'] ?? '',
                       lastMessageTime: room['lastMessageTime'] ?? '',

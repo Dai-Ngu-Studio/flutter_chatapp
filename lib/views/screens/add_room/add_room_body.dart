@@ -85,7 +85,7 @@ class _AddRoomBodyState extends State<AddRoomBody> {
                     Navigator.of(context).pushNamed(
                       AddMemberScreen.routeName,
                       arguments: AddMemberScreenArguments(
-                        onPressd: (user) {
+                        onPressed: (user) {
                           setState(() => listUser.add(user));
                         },
                         users: listUser,
