@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
@@ -21,6 +24,8 @@ class ChatRoomBody extends StatefulWidget {
 class _ChatRoomBodyState extends State<ChatRoomBody> {
   final _user = FirebaseAuth.instance.currentUser;
   final db = FireStoreDB();
+
+  bool _isAttachmentUploading = false;
 
   @override
   void initState() {
@@ -85,17 +90,28 @@ class _ChatRoomBodyState extends State<ChatRoomBody> {
     );
 
     if (result != null && result.files.single.path != null) {
-      final message = types.FileMessage(
-        author: types.User(id: _user!.uid),
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        id: const Uuid().v4(),
-        mimeType: lookupMimeType(result.files.single.path!),
-        name: result.files.single.name,
-        size: result.files.single.size,
-        uri: result.files.single.path!,
-      );
+      _setAttachmentUploading(true);
+      final name = result.files.single.name;
+      final filePath = result.files.single.path!;
+      final file = File(filePath);
 
-      _addMessage(message);
+      try {
+        final reference = FirebaseStorage.instance.ref(name);
+        await reference.putFile(file);
+        final uri = await reference.getDownloadURL();
+
+        final message = types.PartialFile(
+          mimeType: lookupMimeType(filePath),
+          name: name,
+          size: result.files.single.size,
+          uri: uri,
+        );
+
+        db.sendMessage(message, widget.room.id);
+        _setAttachmentUploading(false);
+      } finally {
+        _setAttachmentUploading(false);
+      }
     }
   }
 
@@ -107,22 +123,41 @@ class _ChatRoomBodyState extends State<ChatRoomBody> {
     );
 
     if (result != null) {
+      _setAttachmentUploading(true);
+      final file = File(result.path);
+      final size = file.lengthSync();
       final bytes = await result.readAsBytes();
       final image = await decodeImageFromList(bytes);
+      final name = result.name;
 
-      final message = types.ImageMessage(
-        author: types.User(id: _user!.uid),
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        height: image.height.toDouble(),
-        id: const Uuid().v4(),
-        name: result.name,
-        size: bytes.length,
-        uri: result.path,
-        width: image.width.toDouble(),
-      );
+      try {
+        final reference = FirebaseStorage.instance.ref(name);
+        await reference.putFile(file);
+        final uri = await reference.getDownloadURL();
 
-      _addMessage(message);
+        final message = types.PartialImage(
+          height: image.height.toDouble(),
+          name: name,
+          size: size,
+          uri: uri,
+          width: image.width.toDouble(),
+        );
+
+        db.sendMessage(
+          message,
+          widget.room.id,
+        );
+        _setAttachmentUploading(false);
+      } finally {
+        _setAttachmentUploading(false);
+      }
     }
+  }
+
+  void _setAttachmentUploading(bool uploading) {
+    setState(() {
+      _isAttachmentUploading = uploading;
+    });
   }
 
   void _handleMessageTap(BuildContext context, types.Message message) async {
@@ -162,6 +197,7 @@ class _ChatRoomBodyState extends State<ChatRoomBody> {
         return Chat(
           showUserAvatars: true,
           showUserNames: true,
+          isAttachmentUploading: _isAttachmentUploading,
           theme: DefaultChatTheme(
             inputBackgroundColor: Colors.grey.shade100,
             userAvatarImageBackgroundColor: Colors.black12,

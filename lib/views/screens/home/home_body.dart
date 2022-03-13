@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -67,14 +68,24 @@ class _HomeBodyState extends State<HomeBody> {
                 itemBuilder: (context, index) {
                   final room = snapshot.data!.docs[index];
 
-                  print(room);
-
-                  print("room: ${snapshot.data!.docs[index].data()}");
+                  print(
+                    "HomeBody:: room: ${snapshot.data!.docs[index].data()}",
+                  );
 
                   List<types.User> users = [];
 
-                  for (var user in room['users']) {
-                    users.add(types.User(id: user));
+                  for (var i = 0; i < room['users'].length; i++) {
+                    db.getUserByID(room['users'][i]).then((value) {
+                      final List<DocumentSnapshot> documents = value.docs;
+
+                      users.add(
+                        types.User(
+                          id: documents[0]['uid'],
+                          firstName: documents[0]['displayName'],
+                          imageUrl: documents[0]['imageUrl'],
+                        ),
+                      );
+                    });
                   }
 
                   return GestureDetector(
