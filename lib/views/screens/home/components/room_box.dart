@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chatapp/constants.dart';
 import 'package:flutter_chatapp/views/screens/chat_room/chat_room_screen.dart';
@@ -16,7 +17,7 @@ class RoomBox extends StatelessWidget {
   final types.Room room;
   final String? lastMessageSender;
   final String? lastMessage;
-  final String? lastMessageTime;
+  final Timestamp? lastMessageTime;
 
   @override
   Widget build(BuildContext context) {
@@ -93,8 +94,8 @@ class RoomBox extends StatelessWidget {
                                   ),
                                 ),
                                 TextSpan(
-                                  text: lastMessageTime!.isNotEmpty
-                                      ? ' • ${DateFormat('MMM yy').format(DateTime.fromMicrosecondsSinceEpoch(int.parse(lastMessageTime!)))}'
+                                  text: lastMessageTime != null
+                                      ? ' • ${DateFormat('MMM yy').format(lastMessageTime!.toDate())}'
                                       : '',
                                 ),
                               ],
