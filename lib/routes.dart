@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chatapp/views/screens/add_member/add_member_screen.dart';
 import 'package:flutter_chatapp/views/screens/add_room/add_room_screen.dart';
 import 'package:flutter_chatapp/views/screens/chat_room/chat_room_screen.dart';
 import 'package:flutter_chatapp/views/screens/home/home.dart';
@@ -13,6 +14,7 @@ final Map<String, WidgetBuilder> routes = {
   Home.routeName: (context) => const Home(),
   UserSettingScreen.routeName: (context) => const UserSettingScreen(),
   AddRoomScreen.routeName: (context) => const AddRoomScreen(),
+  AddMemberScreen.routeName: (context) => const AddMemberScreen(),
   ChatRoomScreen.routeName: (context) => const ChatRoomScreen(),
   RoomSettingScreen.routeName: (context) => const RoomSettingScreen(),
 };
