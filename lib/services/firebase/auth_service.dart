@@ -64,6 +64,7 @@ class AuthService {
   Future<void> signOut({required BuildContext context}) async {
     try {
       await FirebaseAuth.instance.signOut();
+      await googleSignIn.signOut();
     } catch (e) {
       throw Exception(e.toString());
     } finally {
