@@ -54,6 +54,8 @@ class FireStoreDB {
       'description': roomDescription,
       'updatedAt': FieldValue.serverTimestamp(),
       'members': users?.map((u) => u.id).toList(),
+      'lastMessage': null,
+      'lastSenderMessage': null,
     });
   }
 }

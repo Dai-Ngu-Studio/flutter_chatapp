@@ -9,6 +9,7 @@ class AddRoomScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         toolbarHeight: 40,
         centerTitle: true,

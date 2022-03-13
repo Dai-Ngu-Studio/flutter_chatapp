@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chatapp/constants.dart';
 import 'package:flutter_chatapp/services/firebase/firestore_service.dart';
 import 'package:flutter_chatapp/utils/debouncer.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
@@ -21,9 +20,11 @@ class AddMemberBody extends StatefulWidget {
 }
 
 class _AddMemberBodyState extends State<AddMemberBody> {
+  late List<types.User> _users;
+
   final int _limit = 20;
   String _textSearch = "";
-  bool isLoading = false;
+  bool _isLoading = false;
 
   Debouncer searchDebouncer = Debouncer(milliseconds: 300);
   StreamController<bool> btnClearController = StreamController<bool>();
@@ -33,6 +34,7 @@ class _AddMemberBodyState extends State<AddMemberBody> {
   @override
   void initState() {
     db.initialize();
+    _users = widget.users;
     super.initState();
   }
 
@@ -151,8 +153,11 @@ class _AddMemberBodyState extends State<AddMemberBody> {
   }
 
   Widget buildItem(BuildContext context, DocumentSnapshot? document) {
-    return document?['uid'].toString() != FirebaseAuth.instance.currentUser!.uid
+    return document?['uid'].toString() !=
+                FirebaseAuth.instance.currentUser!.uid &&
+            !widget.users.any((user) => user.id == document?['uid'].toString())
         ? ListTile(
+            key: ValueKey(document?['uid'].toString()),
             leading: CircleAvatar(
               backgroundColor: Colors.grey.shade400,
               child: Text(
@@ -166,6 +171,9 @@ class _AddMemberBodyState extends State<AddMemberBody> {
                 Text(document?['displayName'], overflow: TextOverflow.ellipsis),
             subtitle: Text(document?['email'], overflow: TextOverflow.ellipsis),
             onTap: () {
+              setState(() {
+                _users.remove((user) => user.id == document?['uid'].toString());
+              });
               if (widget.users
                   .every((element) => element.id != document?['uid'])) {
                 widget.onPressed(types.User(
@@ -173,7 +181,6 @@ class _AddMemberBodyState extends State<AddMemberBody> {
                   firstName: document?['displayName'],
                   imageUrl: document?['imageUrl'],
                 ));
-                Navigator.pop(context);
               } else {
                 const snackBar = SnackBar(
                   content: Text("This member has added to group"),
