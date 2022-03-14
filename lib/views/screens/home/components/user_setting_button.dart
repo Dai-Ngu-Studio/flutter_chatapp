@@ -1,19 +1,33 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
+import 'package:flutter_chatapp/services/firebase/firestore_service.dart';
 import 'package:flutter_chatapp/utils/utilities.dart';
 import 'package:flutter_chatapp/views/screens/chat_room/components/group_avatar/members.dart';
 import 'package:flutter_chatapp/views/screens/chat_room/components/group_avatar/users.dart';
 import 'package:flutter_chatapp/views/screens/user_setting/user_setting_screen.dart';
 
-class UserSettingButton extends StatelessWidget {
+class UserSettingButton extends StatefulWidget {
   const UserSettingButton({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    var firebaseUser = auth.FirebaseAuth.instance.currentUser;
+  State<UserSettingButton> createState() => _UserSettingButtonState();
+}
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 8, left: 8),
+class _UserSettingButtonState extends State<UserSettingButton> {
+  final db = FireStoreDB();
+
+  @override
+  void initState() {
+    db.initialize();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: InkWell(
         onTap: () {
           Navigator.of(context).pushNamed(UserSettingScreen.routeName);
@@ -21,23 +35,32 @@ class UserSettingButton extends StatelessWidget {
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
         borderRadius: BorderRadius.circular(50),
-        child: Members(
-          avatarDiameter: 22,
-          backgroundColor: Colors.grey.shade400,
-          members: [
-            User(
-              firstName: Utilities.getBackgroundWhenNotLoadImage(
-                firebaseUser!.displayName ?? '',
-              ).substring(0, 1),
-              lastName: Utilities.getBackgroundWhenNotLoadImage(
-                firebaseUser.displayName ?? '',
-              ).substring(1, 2),
-              imageUrl: firebaseUser.photoURL ??
+        child: StreamBuilder(
+          stream: db
+              .getUserByID(auth.FirebaseAuth.instance.currentUser!.uid)
+              .asStream(),
+          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: CircleAvatar(
+                radius: 10,
+                backgroundColor: Colors.grey.shade400,
+                child: Text(
                   Utilities.getBackgroundWhenNotLoadImage(
-                    firebaseUser.displayName!,
+                    snapshot.data?.docs[0]['displayName'].toString() ?? '',
                   ),
-            ),
-          ],
+                  style: const TextStyle(color: Colors.white),
+                ),
+                foregroundImage: NetworkImage(
+                  snapshot.data?.docs[0]['imageUrl'],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
