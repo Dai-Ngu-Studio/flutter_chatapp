@@ -52,7 +52,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             onPressed: () {
               Navigator.of(context).pushNamed(
                 RoomSettingScreen.routeName,
-                arguments: args,
+                arguments: RoomSettingScreenArguments(room: args.room),
               );
             },
           ),
