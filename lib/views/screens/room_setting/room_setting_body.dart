@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chatapp/constants.dart';
 import 'package:flutter_chatapp/services/firebase/firestore_service.dart';
 import 'package:flutter_chatapp/views/screens/add_member/add_member_screen.dart';
+import 'package:flutter_chatapp/views/screens/chat_room/chat_room_screen.dart';
 import 'package:flutter_chatapp/views/screens/home/home.dart';
 import 'package:flutter_chatapp/views/screens/room_setting/room_setting_menu.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:flutter_chatapp/views/screens/view_member/view_member_screen.dart';
 
 class RoomSettingBody extends StatefulWidget {
   const RoomSettingBody({Key? key, required this.room}) : super(key: key);
@@ -34,6 +36,15 @@ class _RoomSettingBodyState extends State<RoomSettingBody> {
       padding: kPadding,
       child: Column(
         children: [
+          RoomSettingMenu(
+            text: "View members",
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                ViewMemberScreen.routeName,
+                arguments: ChatRoomScreenArguments(widget.room),
+              );
+            },
+          ),
           RoomSettingMenu(
             text: "Add members",
             onPressed: () async {

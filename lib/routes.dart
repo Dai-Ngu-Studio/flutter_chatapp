@@ -7,6 +7,7 @@ import 'package:flutter_chatapp/views/screens/login/login_screen.dart';
 import 'package:flutter_chatapp/views/screens/room_setting/room_setting_screen.dart';
 import 'package:flutter_chatapp/views/screens/splash/splash_screen.dart';
 import 'package:flutter_chatapp/views/screens/user_setting/user_setting_screen.dart';
+import 'package:flutter_chatapp/views/screens/view_member/view_member_screen.dart';
 
 final Map<String, WidgetBuilder> routes = {
   SplashScreen.routeName: (context) => const SplashScreen(),
@@ -17,4 +18,5 @@ final Map<String, WidgetBuilder> routes = {
   AddMemberScreen.routeName: (context) => const AddMemberScreen(),
   ChatRoomScreen.routeName: (context) => const ChatRoomScreen(),
   RoomSettingScreen.routeName: (context) => const RoomSettingScreen(),
+  ViewMemberScreen.routeName: (context) => const ViewMemberScreen(),
 };
