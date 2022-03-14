@@ -46,7 +46,7 @@ class RoomBox extends StatelessWidget {
                   radius: 25,
                   backgroundColor: Colors.grey.shade400,
                   child: Text(
-                    getBackgroundWhenNotLoadImage("Dai Ngu"),
+                    getBackgroundWhenNotLoadImage(room.name!),
                     style: const TextStyle(color: Colors.white),
                   ),
                   foregroundImage: NetworkImage(
