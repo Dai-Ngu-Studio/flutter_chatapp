@@ -222,4 +222,19 @@ class FireStoreDB {
       },
     );
   }
+
+  Future<bool> isExistInRoom({
+    required String roomId,
+    required String? userId,
+  }) async {
+    if (userId != null) {
+      var snapshot = await firestore.collection("rooms").doc(roomId).get();
+      for (var u in snapshot.get("users")) {
+        if (u == userId) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 }

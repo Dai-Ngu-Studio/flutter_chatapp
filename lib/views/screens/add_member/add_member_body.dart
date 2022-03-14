@@ -9,11 +9,18 @@ import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chatapp/utils/utilities.dart';
 
 class AddMemberBody extends StatefulWidget {
-  const AddMemberBody({Key? key, required this.onPressed, required this.users})
-      : super(key: key);
+  const AddMemberBody({
+    Key? key,
+    required this.onPressed,
+    required this.users,
+    required this.isUpdate,
+    this.roomId,
+  }) : super(key: key);
 
   final Function onPressed;
+  final bool isUpdate;
   final List<types.User> users;
+  final String? roomId;
 
   @override
   State<AddMemberBody> createState() => _AddMemberBodyState();
@@ -66,7 +73,18 @@ class _AddMemberBodyState extends State<AddMemberBody> {
                         padding: const EdgeInsets.all(10),
                         scrollDirection: Axis.vertical,
                         itemBuilder: (context, index) {
-                          return buildItem(context, snapshot.data?.docs[index]);
+                          return FutureBuilder<Widget>(
+                            builder: (context, AsyncSnapshot<Widget> snapshot) {
+                              switch (snapshot.connectionState) {
+                                case ConnectionState.done:
+                                  return snapshot.data!;
+                                default:
+                                  return Container();
+                              }
+                            },
+                            future:
+                                buildItem(context, snapshot.data?.docs[index]),
+                          );
                         },
                         itemCount: snapshot.data?.docs.length,
                       ),
@@ -152,10 +170,27 @@ class _AddMemberBodyState extends State<AddMemberBody> {
     );
   }
 
-  Widget buildItem(BuildContext context, DocumentSnapshot? document) {
+  Future<bool> isUserInRoom(
+    DocumentSnapshot? document,
+  ) async {
+    if (widget.isUpdate) {
+      var exist = await db.isExistInRoom(
+        roomId: widget.roomId!,
+        userId: document?['uid'].toString(),
+      );
+      return exist;
+    } else {
+      return false;
+    }
+  }
+
+  Future<Widget> buildItem(
+      BuildContext context, DocumentSnapshot? document) async {
     return document?['uid'].toString() !=
                 FirebaseAuth.instance.currentUser!.uid &&
-            !widget.users.any((user) => user.id == document?['uid'].toString())
+            !widget.users
+                .any((user) => user.id == document?['uid'].toString()) &&
+            !(await isUserInRoom(document))
         ? ListTile(
             key: ValueKey(document?['uid'].toString()),
             leading: CircleAvatar(

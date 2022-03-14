@@ -89,6 +89,7 @@ class _AddRoomBodyState extends State<AddRoomBody> {
                           setState(() => listUser.add(user));
                         },
                         users: listUser,
+                        isUpdate: false,
                       ),
                     );
                   },

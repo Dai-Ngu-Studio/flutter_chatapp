@@ -29,7 +29,12 @@ class AddMemberScreen extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: AddMemberBody(onPressed: args.onPressed, users: args.users),
+      body: AddMemberBody(
+        onPressed: args.onPressed,
+        users: args.users,
+        isUpdate: args.isUpdate,
+        roomId: args.roomId,
+      ),
     );
   }
 }
@@ -37,7 +42,13 @@ class AddMemberScreen extends StatelessWidget {
 class AddMemberScreenArguments {
   final Function onPressed;
   final List<types.User> users;
+  final bool isUpdate;
+  final String? roomId;
 
-  const AddMemberScreenArguments(
-      {required this.onPressed, required this.users});
+  const AddMemberScreenArguments({
+    required this.onPressed,
+    required this.users,
+    required this.isUpdate,
+    this.roomId,
+  });
 }
