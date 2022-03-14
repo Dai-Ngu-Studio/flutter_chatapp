@@ -7,10 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_chatapp/services/firebase/firestore_service.dart';
+import 'package:flutter_chatapp/services/firebase/storage_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:open_file/open_file.dart';
-import 'package:uuid/uuid.dart';
 
 class ChatRoomBody extends StatefulWidget {
   const ChatRoomBody({Key? key, required this.room}) : super(key: key);
@@ -23,6 +23,7 @@ class ChatRoomBody extends StatefulWidget {
 
 class _ChatRoomBodyState extends State<ChatRoomBody> {
   final _user = FirebaseAuth.instance.currentUser;
+  final _storage = StorageService();
   final db = FireStoreDB();
 
   bool _isAttachmentUploading = false;
@@ -33,19 +34,14 @@ class _ChatRoomBodyState extends State<ChatRoomBody> {
     super.initState();
   }
 
-  void _addMessage(types.Message message) {
-    setState(() {
-      db.sendMessage(message, widget.room.id);
-    });
-  }
-
   void _handleAtachmentPressed() {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
         return SafeArea(
           child: SizedBox(
-            height: 144,
+            // height: 144,
+            height: 100,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
@@ -59,16 +55,17 @@ class _ChatRoomBodyState extends State<ChatRoomBody> {
                     child: Text('Photo'),
                   ),
                 ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _handleFileSelection();
-                  },
-                  child: const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('File'),
-                  ),
-                ),
+                // TODO: Implement download file to unlock this function
+                // TextButton(
+                //   onPressed: () {
+                //     Navigator.pop(context);
+                //     _handleFileSelection();
+                //   },
+                //   child: const Align(
+                //     alignment: Alignment.centerLeft,
+                //     child: Text('File'),
+                //   ),
+                // ),
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: const Align(
@@ -131,23 +128,21 @@ class _ChatRoomBodyState extends State<ChatRoomBody> {
       final name = result.name;
 
       try {
-        final reference = FirebaseStorage.instance.ref(name);
-        await reference.putFile(file);
-        final uri = await reference.getDownloadURL();
+        _storage.uploadFile(fileName: name, file: file).then((uri) {
+          final message = types.PartialImage(
+            height: image.height.toDouble(),
+            name: name,
+            size: size,
+            uri: uri,
+            width: image.width.toDouble(),
+          );
 
-        final message = types.PartialImage(
-          height: image.height.toDouble(),
-          name: name,
-          size: size,
-          uri: uri,
-          width: image.width.toDouble(),
-        );
-
-        db.sendMessage(
-          message,
-          widget.room.id,
-        );
-        _setAttachmentUploading(false);
+          db.sendMessage(
+            message,
+            widget.room.id,
+          );
+          _setAttachmentUploading(false);
+        });
       } finally {
         _setAttachmentUploading(false);
       }
@@ -161,8 +156,10 @@ class _ChatRoomBodyState extends State<ChatRoomBody> {
   }
 
   void _handleMessageTap(BuildContext context, types.Message message) async {
-    if (message is types.FileMessage) {
+    if (message is types.ImageMessage) {
       await OpenFile.open(message.uri);
+    } else if (message is types.FileMessage) {
+      // TODO: Implement download file
     }
   }
 
