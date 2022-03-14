@@ -15,6 +15,10 @@ class $AssetsImagesGen {
   /// File path: assets/images/flutter_chatapp_logo.png
   AssetGenImage get flutterChatappLogo =>
       const AssetGenImage('assets/images/flutter_chatapp_logo.png');
+
+  /// File path: assets/images/placeholder_group_image.png
+  AssetGenImage get placeholderGroupImage =>
+      const AssetGenImage('assets/images/placeholder_group_image.png');
 }
 
 class $AssetsSvgsGen {
