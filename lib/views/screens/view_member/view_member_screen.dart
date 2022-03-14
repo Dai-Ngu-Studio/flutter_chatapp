@@ -50,7 +50,10 @@ class _ViewMemberScreenState extends State<ViewMemberScreen> {
             if (!snapshot.hasData) {
               return const CircularProgressIndicator();
             }
-            return ViewMemberBody(room: args.room);
+            return ViewMemberBody(
+              room: args.room,
+              users: [],
+            );
           },
         ));
   }
