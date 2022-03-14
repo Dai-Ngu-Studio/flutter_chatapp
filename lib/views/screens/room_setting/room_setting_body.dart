@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chatapp/constants.dart';
 import 'package:flutter_chatapp/services/firebase/firestore_service.dart';
+import 'package:flutter_chatapp/utils/utilities.dart';
 import 'package:flutter_chatapp/views/screens/add_member/add_member_screen.dart';
 import 'package:flutter_chatapp/views/screens/chat_room/chat_room_screen.dart';
 import 'package:flutter_chatapp/views/screens/home/home.dart';
@@ -36,6 +37,29 @@ class _RoomSettingBodyState extends State<RoomSettingBody> {
       padding: kPadding,
       child: Column(
         children: [
+          Column(
+            children: [
+              CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.grey.shade400,
+                child: Text(
+                  Utilities.getBackgroundWhenNotLoadImage(widget.room.name!),
+                  style: const TextStyle(color: Colors.white, fontSize: 40),
+                ),
+                foregroundImage: NetworkImage(widget.room.imageUrl ?? ''),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                widget.room.name!,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
           RoomSettingMenu(
             text: "View members",
             onPressed: () {
@@ -75,11 +99,38 @@ class _RoomSettingBodyState extends State<RoomSettingBody> {
           RoomSettingMenu(
             text: "Leave room",
             onPressed: () {
-              db.leaveRoom(
-                  user: types.User(id: _user!.uid), roomId: widget.room.id);
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                Home.routeName,
-                (route) => false,
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text("Leave room"),
+                    content: const Text(
+                      "Are you sure you want to leave this room?",
+                    ),
+                    actions: [
+                      ElevatedButton(
+                        child: const Text("Cancel"),
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.grey,
+                        ),
+                      ),
+                      ElevatedButton(
+                        child: const Text("Leave"),
+                        onPressed: () async {
+                          await db.leaveRoom(
+                            user: types.User(id: _user!.uid),
+                            roomId: widget.room.id,
+                          );
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            Home.routeName,
+                            (route) => false,
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                },
               );
             },
           ),
