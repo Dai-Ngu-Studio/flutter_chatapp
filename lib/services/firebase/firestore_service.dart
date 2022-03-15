@@ -234,4 +234,19 @@ class FireStoreDB {
     }
     return false;
   }
+
+  Future<void> updateGroupRoom({
+    required String roomId,
+    required String roomName,
+    required String roomDescription,
+    String? imageUrl,
+  }) async {
+    await firestore.collection("rooms").doc(roomId).update(
+      {
+        "name": roomName,
+        "description": roomDescription,
+        "imageUrl": imageUrl,
+      },
+    );
+  }
 }

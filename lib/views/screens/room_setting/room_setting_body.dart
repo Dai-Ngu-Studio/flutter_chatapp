@@ -1,19 +1,23 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chatapp/constants.dart';
 import 'package:flutter_chatapp/services/firebase/firestore_service.dart';
 import 'package:flutter_chatapp/utils/utilities.dart';
 import 'package:flutter_chatapp/views/screens/add_member/add_member_screen.dart';
-import 'package:flutter_chatapp/views/screens/chat_room/chat_room_screen.dart';
+import 'package:flutter_chatapp/views/screens/edit_room/edit_room_screen.dart';
 import 'package:flutter_chatapp/views/screens/home/home.dart';
 import 'package:flutter_chatapp/views/screens/room_setting/room_setting_menu.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chatapp/views/screens/view_member/view_member_screen.dart';
 
 class RoomSettingBody extends StatefulWidget {
-  const RoomSettingBody({Key? key, required this.room}) : super(key: key);
+  const RoomSettingBody({
+    Key? key,
+    required this.room,
+  }) : super(key: key);
 
-  final types.Room room;
+  final DocumentSnapshot<Object?> room;
 
   @override
   State<RoomSettingBody> createState() => _RoomSettingBodyState();
@@ -43,14 +47,16 @@ class _RoomSettingBodyState extends State<RoomSettingBody> {
                 radius: 50,
                 backgroundColor: Colors.grey.shade400,
                 child: Text(
-                  Utilities.getBackgroundWhenNotLoadImage(widget.room.name!),
+                  Utilities.getBackgroundWhenNotLoadImage(
+                      widget.room.get("name")),
                   style: const TextStyle(color: Colors.white, fontSize: 40),
                 ),
-                foregroundImage: NetworkImage(widget.room.imageUrl ?? ''),
+                foregroundImage:
+                    NetworkImage(widget.room.get("imageUrl") ?? ''),
               ),
               const SizedBox(height: 10),
               Text(
-                widget.room.name!,
+                widget.room.get("name"),
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 30,
@@ -65,7 +71,9 @@ class _RoomSettingBodyState extends State<RoomSettingBody> {
             onPressed: () {
               Navigator.of(context).pushNamed(
                 ViewMemberScreen.routeName,
-                arguments: ChatRoomScreenArguments(widget.room),
+                arguments: ViewMemberScreenArguments(
+                  widget.room,
+                ),
               );
             },
           ),
@@ -93,6 +101,17 @@ class _RoomSettingBodyState extends State<RoomSettingBody> {
                     );
                   }
                 },
+              );
+            },
+          ),
+          RoomSettingMenu(
+            text: "Edit Room",
+            onPressed: () async {
+              Navigator.of(context).pushNamed(
+                EditRoomScreen.routeName,
+                arguments: EditRoomScreenArguments(
+                  widget.room,
+                ),
               );
             },
           ),

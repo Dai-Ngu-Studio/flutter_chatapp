@@ -1,18 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chatapp/services/firebase/firestore_service.dart';
-import 'package:flutter_chatapp/views/screens/view_member/view_member_body.dart';
+import 'package:flutter_chatapp/views/screens/edit_room/edit_room_body.dart';
 
-class ViewMemberScreen extends StatefulWidget {
-  const ViewMemberScreen({Key? key}) : super(key: key);
+class EditRoomScreen extends StatefulWidget {
+  const EditRoomScreen({Key? key}) : super(key: key);
 
-  static String routeName = '/view-member';
+  static String routeName = '/edit-room';
 
   @override
-  State<ViewMemberScreen> createState() => _ViewMemberScreenState();
+  State<EditRoomScreen> createState() => _EditRoomScreenState();
 }
 
-class _ViewMemberScreenState extends State<ViewMemberScreen> {
+class _EditRoomScreenState extends State<EditRoomScreen> {
   final db = FireStoreDB();
 
   @override
@@ -23,15 +23,15 @@ class _ViewMemberScreenState extends State<ViewMemberScreen> {
 
   @override
   Widget build(BuildContext context) {
-    ViewMemberScreenArguments args =
-        ModalRoute.of(context)!.settings.arguments as ViewMemberScreenArguments;
+    EditRoomScreenArguments args =
+        ModalRoute.of(context)!.settings.arguments as EditRoomScreenArguments;
 
     return Scaffold(
         appBar: AppBar(
           toolbarHeight: 40,
           centerTitle: true,
           title: const Text(
-            'Members',
+            'Edit Room',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -49,16 +49,16 @@ class _ViewMemberScreenState extends State<ViewMemberScreen> {
             if (!snapshot.hasData) {
               return const CircularProgressIndicator();
             }
-            return ViewMemberBody(
-              room: args.room,
+            return EditRoomBody(
+              room: snapshot.data!,
             );
           },
         ));
   }
 }
 
-class ViewMemberScreenArguments {
+class EditRoomScreenArguments {
   final DocumentSnapshot<Object?> room;
 
-  ViewMemberScreenArguments(this.room);
+  EditRoomScreenArguments(this.room);
 }

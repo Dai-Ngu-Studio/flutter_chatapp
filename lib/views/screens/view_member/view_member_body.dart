@@ -1,10 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chatapp/constants.dart';
 import 'package:flutter_chatapp/services/firebase/firestore_service.dart';
-import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chatapp/utils/debouncer.dart';
 import 'package:flutter_chatapp/utils/utilities.dart';
 
@@ -12,22 +9,17 @@ class ViewMemberBody extends StatefulWidget {
   const ViewMemberBody({
     Key? key,
     required this.room,
-    required this.users,
   }) : super(key: key);
 
-  final List<types.User> users;
-  final types.Room room;
+  final DocumentSnapshot<Object?> room;
 
   @override
   State<ViewMemberBody> createState() => _ViewMemberBodyState();
 }
 
 class _ViewMemberBodyState extends State<ViewMemberBody> {
-  late List<types.User> _users;
-
   final int _limit = 20;
   String _textSearch = "";
-  bool _isLoading = false;
 
   Debouncer searchDebouncer = Debouncer(milliseconds: 300);
   StreamController<bool> btnClearController = StreamController<bool>();
@@ -37,7 +29,6 @@ class _ViewMemberBodyState extends State<ViewMemberBody> {
   @override
   void initState() {
     db.initialize();
-    _users = widget.users;
     super.initState();
   }
 

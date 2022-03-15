@@ -31,7 +31,6 @@ class _AddMemberBodyState extends State<AddMemberBody> {
 
   final int _limit = 20;
   String _textSearch = "";
-  bool _isLoading = false;
 
   Debouncer searchDebouncer = Debouncer(milliseconds: 300);
   StreamController<bool> btnClearController = StreamController<bool>();
