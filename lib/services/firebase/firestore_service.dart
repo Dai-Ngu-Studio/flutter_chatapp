@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chatapp/utils/utilities.dart';
+import 'package:http/http.dart' as http;
 
 class FireStoreDB {
   late FirebaseFirestore firestore;
@@ -16,7 +20,7 @@ class FireStoreDB {
       'createdAt': FieldValue.serverTimestamp(),
       'displayName': user.firstName,
       'email': email,
-      'fcmToken': fcmToken,
+      'fcmToken': [fcmToken],
       'imageUrl': user.imageUrl,
       'uid': user.id,
       'keywords': Utilities.generateKeywords(user.firstName!),
@@ -179,7 +183,68 @@ class FireStoreDB {
       };
 
       await firestore.collection('rooms').doc(roomId).update(lastMessageMap);
+
+      firestore
+          .collection('rooms')
+          .doc(roomId)
+          .get()
+          .then((doc) => doc['name'])
+          .then((name) {
+        pushNotification(
+          roomID: roomId,
+          message: messageMap['text'],
+          roomName: name,
+        );
+      });
     }
+  }
+
+  pushNotification({
+    required String roomID,
+    required String roomName,
+    required String message,
+  }) {
+    firestore.collection('rooms').doc(roomID).get().then((room) {
+      room['users'].forEach((userID) {
+        if (userID != FirebaseAuth.instance.currentUser!.uid) {
+          firestore.collection('users').doc(userID).get().then((user) {
+            user['fcmToken']?.forEach((token) {
+              sendPushNotification(
+                token: token,
+                roomName: roomName,
+                message: message,
+              );
+            });
+          });
+        }
+      });
+    });
+  }
+
+  sendPushNotification({
+    required String token,
+    required String roomName,
+    required String message,
+  }) async {
+    final url = Uri.parse(
+      'https://daingu-chatapp-firebase-admin.herokuapp.com/message/send',
+    );
+
+    Map<String, String> header = {"content-type": "application/json"};
+
+    String json = jsonEncode({
+      'token': token,
+      'type': {
+        "notification": {
+          "title": "New Message from $roomName",
+          "body": message,
+        },
+        "data": {"route": "/home"}
+      }
+    });
+
+    final response = await http.post(url, headers: header, body: json);
+    log(response.statusCode.toString());
   }
 
   void updateMessage(types.Message message, String roomId) async {
