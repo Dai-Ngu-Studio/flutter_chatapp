@@ -55,6 +55,6 @@ class Utilities {
 
     return listNameSplit.length == 1
         ? listNameSplit.first.substring(0, 2).toUpperCase()
-        : firstChar + lastChar;
+        : (firstChar + lastChar).toUpperCase();
   }
 }
