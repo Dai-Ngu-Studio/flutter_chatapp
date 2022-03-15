@@ -49,7 +49,7 @@ class _HomeBodyState extends State<HomeBody> {
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.data!.size == 0) {
+              } else if (!snapshot.hasData) {
                 return Container(
                   alignment: Alignment.center,
                   margin: const EdgeInsets.only(
@@ -57,63 +57,59 @@ class _HomeBodyState extends State<HomeBody> {
                   ),
                   child: const Text('No rooms'),
                 );
-              }
+              } else {
+                return ListView.builder(
+                  itemCount: snapshot.data!.size,
+                  itemBuilder: (context, index) {
+                    final room = snapshot.data!.docs[index];
 
-              return ListView.builder(
-                itemCount: snapshot.data!.size,
-                itemBuilder: (context, index) {
-                  final room = snapshot.data!.docs[index];
+                    List<types.User> users = [];
 
-                  print(
-                    "HomeBody:: room: ${snapshot.data!.docs[index].data()}",
-                  );
+                    for (var i = 0; i < room['users'].length; i++) {
+                      db.getUserByID(room['users'][i]).then((value) {
+                        final List<DocumentSnapshot> documents = value.docs;
 
-                  List<types.User> users = [];
-
-                  for (var i = 0; i < room['users'].length; i++) {
-                    db.getUserByID(room['users'][i]).then((value) {
-                      final List<DocumentSnapshot> documents = value.docs;
-
-                      users.add(
-                        types.User(
-                          id: documents[0]['uid'],
-                          firstName: documents[0]['displayName'],
-                          imageUrl: documents[0]['imageUrl'],
-                        ),
-                      );
-                    });
-                  }
-
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pushNamed(
-                        ChatRoomScreen.routeName,
-                        arguments: ChatRoomScreenArguments(
-                          types.Room(
-                            id: room.id,
-                            users: room['users'],
-                            name: room['name'],
-                            imageUrl: room['imageUrl'],
-                            type: types.RoomType.group,
+                        users.add(
+                          types.User(
+                            id: documents[0]['uid'],
+                            firstName: documents[0]['displayName'],
+                            imageUrl: documents[0]['imageUrl'],
                           ),
+                        );
+                      });
+                    }
+
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(
+                          ChatRoomScreen.routeName,
+                          arguments: ChatRoomScreenArguments(
+                            types.Room(
+                              id: room.id,
+                              users: room['users'],
+                              name: room['name'],
+                              imageUrl: room['imageUrl'],
+                              type: types.RoomType.group,
+                            ),
+                          ),
+                        );
+                      },
+                      child: RoomBox(
+                        room: types.Room(
+                          id: room.id,
+                          users: users,
+                          name: room['name'],
+                          imageUrl: room['imageUrl'],
+                          type: types.RoomType.group,
                         ),
-                      );
-                    },
-                    child: RoomBox(
-                      room: types.Room(
-                        id: room.id,
-                        users: users,
-                        name: room['name'],
-                        imageUrl: room['imageUrl'],
-                        type: types.RoomType.group,
+                        lastMessageSender: room['lastSenderName'] ?? '',
+                        lastMessage: room['lastMessage'] ?? '',
+                        lastMessageTime: room['lastMessageTime'],
                       ),
-                      lastMessageSender: room['lastSenderName'] ?? '',
-                      lastMessage: room['lastMessage'] ?? '',
-                      lastMessageTime: room['lastMessageTime'],
-                    ),
-                  );
-                },
-              );
+                    );
+                  },
+                );
+              }
             },
           ),
         )

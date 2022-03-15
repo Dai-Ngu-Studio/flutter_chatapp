@@ -76,6 +76,7 @@ class FireStoreDB {
     return firestore
         .collection("rooms")
         .where("users", arrayContains: fu.uid)
+        .orderBy("lastMessageTime", descending: true)
         .snapshots();
   }
 
@@ -243,8 +244,7 @@ class FireStoreDB {
       }
     });
 
-    final response = await http.post(url, headers: header, body: json);
-    log(response.statusCode.toString());
+    await http.post(url, headers: header, body: json);
   }
 
   void updateMessage(types.Message message, String roomId) async {
