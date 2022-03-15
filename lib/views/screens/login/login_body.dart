@@ -171,6 +171,13 @@ class _LoginBodyState extends State<LoginBody> {
                   email: _firebaseAuth.currentUser!.email!,
                   fcmToken: fcmToken!,
                 );
+              } else {
+                FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(_firebaseAuth.currentUser!.uid)
+                    .update({
+                  'fcmToken': FieldValue.arrayUnion([fcmToken!])
+                });
               }
               Navigator.of(context).pushReplacementNamed(Home.routeName);
             });
